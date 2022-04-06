@@ -1,4 +1,5 @@
 ﻿using CommonLayer.Models;
+using Microsoft.Extensions.Configuration;
 using RepositoryLayer.Entities;
 using RepositoryLayer.Interfaces;
 using System;
@@ -12,17 +13,18 @@ namespace RepositoryLayer.Services
     {
 
         private SqlConnection sqlConnection;
+        private IConfiguration config;
 
         public UserRL(IConfiguration config)
         {
-
+            this.config = config;
         }
 
-        public bool Register(RegisterModel registerModel)
+        public async bool Register(RegisterModel registerModel)
         {
             try
             {
-                
+                sqlConnection = new SqlConnection(this.config.GetConnectionString("BookStoreDB"));
             }
             catch (Exception)
             {
