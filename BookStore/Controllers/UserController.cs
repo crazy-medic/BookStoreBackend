@@ -13,6 +13,6 @@ namespace BookStore.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserBL<User> userBL;
+        private readonly IUserBL userBL;
     }
 }

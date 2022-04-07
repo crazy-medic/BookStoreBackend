@@ -19,6 +19,6 @@ namespace CommonLayer.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        public long? PhoneNumber { get; set; }
+        public long? Phone { get; set; }
     }
 }
