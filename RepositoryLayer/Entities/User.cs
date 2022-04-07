@@ -10,7 +10,7 @@ namespace RepositoryLayer.Entities
         public string EmailId { get; set; }
         public string FullName { get; set; }
         public string Password { get; set; }
-        public long? PhoneNumber { get; set; }
+        public long? Phone { get; set; }
         public DateTime CreatedAt { get; internal set; }
         public DateTime? ModifiedAt { get; internal set; }
     }

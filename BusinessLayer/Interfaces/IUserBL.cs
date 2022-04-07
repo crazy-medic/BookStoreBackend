@@ -9,5 +9,6 @@ namespace BusinessLayer.Interfaces
     public interface IUserBL
     {
         public Task Register(RegisterModel registerModel);
+        public string Login(LoginModel loginModel);
     }
 }

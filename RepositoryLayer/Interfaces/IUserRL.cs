@@ -9,5 +9,7 @@ namespace RepositoryLayer.Interfaces
     public interface IUserRL
     {
         public Task Register(RegisterModel registerModel);
+
+        public string Login(LoginModel loginModel);
     }
 }
