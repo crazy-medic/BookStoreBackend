@@ -132,16 +132,19 @@ namespace RepositoryLayer.Services
                     User user = new User();
                     SqlCommand sqlcmd = new SqlCommand("spForgetPassword", sqlConnection);
                     sqlcmd.CommandType = CommandType.StoredProcedure;
+                    sqlcmd.Parameters.AddWithValue("@EmailId", email);
                     sqlConnection.Open();
                     var result = sqlcmd.ExecuteNonQuery();
                     if (result!=0)
                     {
                         string token = GenerateToken(email);
                         Sender(token);
+                        sqlConnection.Close();
                         return token;
                     }
                     else
                     {
+                        sqlConnection.Close();
                         return null;
                     }
                 }
@@ -189,7 +192,8 @@ namespace RepositoryLayer.Services
                 };
                 message.From = new MailAddress("vineethclass250@gmail.com");
                 message.To.Add(new MailAddress("vineethclass250@gmail.com"));
-                string bodymessage = @"<p>Your password has been reset.Please click the link to create new password.</p>" + string.Format("<a href=\"https://localhost:4200/api/User/ResetPassword.aspx?token={0}\">Reset Password Link</a>");
+                string link = string.Format("<a href=\"https://localhost:4200/api/User/ResetPassword.aspx?token=" + token + ">Reset Password Link</a>");
+                string bodymessage = @"<p>Your password has been reset.Please click the link to create new password.</p>" + link;
                 message.Subject = "Reset password link";
                 message.IsBodyHtml = true; //to make message body as html  
                 message.Body = bodymessage;
@@ -199,6 +203,37 @@ namespace RepositoryLayer.Services
 
             //For a msmq reciver
             msmq.BeginReceive();
+        }
+
+        public bool ResetPassword(string email, string password)
+        {
+            this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
+            try
+            {
+                using (sqlConnection)
+                {
+                    SqlCommand sqlcmd = new SqlCommand("spResetPassword", sqlConnection);
+                    sqlcmd.CommandType = CommandType.StoredProcedure;
+                    sqlcmd.Parameters.AddWithValue("@EmailId", email);
+                    sqlcmd.Parameters.AddWithValue("@Password", password);
+                    sqlConnection.Open();
+                    var result = sqlcmd.ExecuteNonQuery();
+                    if (result != 0)
+                    {
+                        sqlConnection.Close();
+                        return true;
+                    }
+                    else
+                    {
+                        sqlConnection.Close();
+                        return false;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

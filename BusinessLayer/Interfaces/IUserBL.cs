@@ -11,5 +11,6 @@ namespace BusinessLayer.Interfaces
         public Task Register(RegisterModel registerModel);
         public string Login(LoginModel loginModel);
         public string SendResetLink(string email);
+        public bool ResetPassword(string email, string password);
     }
 }

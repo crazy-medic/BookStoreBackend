@@ -12,5 +12,6 @@ namespace RepositoryLayer.Interfaces
 
         public string Login(LoginModel loginModel);
         public string SendResetLink(string email);
+        public bool ResetPassword(string email, string password);
     }
 }
