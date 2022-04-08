@@ -48,5 +48,29 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { status = 400, isSuccess = false, Message = e.Message });
             }
         }
+
+        [HttpPost("ForgotPassword")]
+        public IActionResult ForgotPassword(string email)
+        {
+            if (email == null)
+            {
+                return this.BadRequest(new { Status = 400, isSuccess = false, Message = "Enter an email" });
+            }
+            try
+            {
+                if (this.userBL.SendResetLink(email) != null)
+                {
+                    return this.Ok(new { Status = 200, isSuccess = true, Message = "Reset password link sent" });
+                }
+                else
+                {
+                    return this.BadRequest(new { Status = 400, isSuccess = false, Message = "Email not found in database" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { Status = 400, isSuccess = false, Message = e.InnerException.Message });
+            }
+        }
     }
 }
