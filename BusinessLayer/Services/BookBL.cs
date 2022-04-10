@@ -22,6 +22,30 @@ namespace BusinessLayer.Services
             }
         }
 
+        public IEnumerable<Book> GetAllBooks()
+        {
+            try
+            {
+                return this.bookRL.GetAllBooks();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<Book> GetBookbyId(int BookId)
+        {
+            try
+            {
+                return this.bookRL.GetBookbyId(BookId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public bool UpdateBook(Book book)
         {
             try

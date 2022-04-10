@@ -87,5 +87,96 @@ namespace RepositoryLayer.Services
                 throw;
             }
         }
+
+        public IEnumerable<Book> GetAllBooks()
+        {
+            sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
+            try
+            {
+                using (sqlConnection)
+                {
+                    List<Book> books = new List<Book>();
+                    SqlCommand sqlCommand = new SqlCommand("spGetAllBooks", sqlConnection);
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+                    sqlConnection.Open();
+                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            Book book = new Book();
+                            book.BookId = Convert.ToInt32(reader["BookId"]);
+                            book.BookName = reader["BookName"].ToString();
+                            book.Author = reader["Author"].ToString();
+                            book.BookInfo = reader["BookInfo"].ToString();
+                            book.Quantity = Convert.ToInt32(reader["Quantity"]);
+                            book.DiscountPrice = Convert.ToInt32(reader["DiscountPrice"]);
+                            book.ActualPrice = Convert.ToInt32(reader["ActualPrice"]);
+                            book.BookImage = reader["BookImage"].ToString();
+                            book.Rating = Convert.ToInt32(reader["Rating"]);
+                            book.ReviewerCount = Convert.ToInt32(reader["ReviewerCount"]);
+                            books.Add(book);
+                        }
+                        sqlConnection.Close();
+                        return books;
+                    }
+                    else
+                    {
+                        sqlConnection.Close();
+                        return null;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<Book> GetBookbyId(int BookId)
+        {
+            sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
+            try
+            {
+                using (sqlConnection)
+                {
+                    List<Book> books = new List<Book>();
+                    SqlCommand sqlCommand = new SqlCommand("spGetBookbyId", sqlConnection);
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+                    sqlCommand.Parameters.AddWithValue("BookId", BookId);
+                    sqlConnection.Open();
+                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            Book book = new Book();
+                            book.BookId = Convert.ToInt32(reader["BookId"]);
+                            book.BookName = reader["BookName"].ToString();
+                            book.Author = reader["Author"].ToString();
+                            book.BookInfo = reader["BookInfo"].ToString();
+                            book.Quantity = Convert.ToInt32(reader["Quantity"]);
+                            book.DiscountPrice = Convert.ToInt32(reader["DiscountPrice"]);
+                            book.ActualPrice = Convert.ToInt32(reader["ActualPrice"]);
+                            book.BookImage = reader["BookImage"].ToString();
+                            book.Rating = Convert.ToInt32(reader["Rating"]);
+                            book.ReviewerCount = Convert.ToInt32(reader["ReviewerCount"]);
+                            books.Add(book);
+                        }
+                        sqlConnection.Close();
+                        return books;
+                    }
+                    else
+                    {
+                        sqlConnection.Close();
+                        return null;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

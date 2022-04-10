@@ -43,16 +43,17 @@ namespace BookStore.Controllers
                 }
                 else
                 {
-                    return this.BadRequest(new { status = 400, isSuccess = false, Message = "Unauthorized" });
+                    return this.Unauthorized(new { status = 400, isSuccess = false, Message = "Unauthorized" });
                 }
 
             }
             catch (Exception e)
             {
-                return this.NotFound(new { status = 404, isSuccess = false, Message = e.Message });
+                return this.BadRequest(new { status = 404, isSuccess = false, Message = e.Message });
             }
         }
 
+        [Authorize]
         [HttpPost("Update")]
         public IActionResult UpdateBook(Book book)
         {
@@ -74,12 +75,54 @@ namespace BookStore.Controllers
                 }
                 else
                 {
-                    return this.BadRequest(new { status = 400, isSuccess = false, Message = "Unauthorized" });
+                    return this.Unauthorized(new { status = 400, isSuccess = false, Message = "Unauthorized" });
                 }
             }
             catch (Exception e)
             {
-                return this.NotFound(new { status = 404, isSuccess = false, Message = e.Message });
+                return this.BadRequest(new { status = 404, isSuccess = false, Message = e.Message });
+            }
+        }
+
+        [HttpGet("GetAll")]
+        public IActionResult GetAllBooks()
+        {
+            try
+            {
+                var listofbooks = this.bookBL.GetAllBooks();
+                if (listofbooks != null)
+                {
+                    return this.Ok(new { status = 200, isSuccess = true, Message = "List of all books retrieved", data = listofbooks });
+                }
+                else
+                {
+                    return this.NotFound(new { status = 404, isSuccess = false, Message = "No books found in database" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 404, isSuccess = false, Message = e.Message });
+            }
+        }
+
+        [HttpGet("GetBook/{id}")]
+        public IActionResult GetBookbyId(int BookId)
+        {
+            try
+            {
+                var listofbooks = this.bookBL.GetBookbyId(BookId);
+                if (listofbooks != null)
+                {
+                    return this.Ok(new { status = 200, isSuccess = true, Message = "List of all books retrieved", data = listofbooks });
+                }
+                else
+                {
+                    return this.NotFound(new { status = 404, isSuccess = false, Message = "No books found in database" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 404, isSuccess = false, Message = e.Message });
             }
         }
     }
