@@ -105,15 +105,36 @@ namespace BookStore.Controllers
             }
         }
 
-        [HttpGet("GetBook/{id}")]
+        [HttpGet("{id}/GetBook")]
         public IActionResult GetBookbyId(int BookId)
         {
             try
             {
-                var listofbooks = this.bookBL.GetBookbyId(BookId);
-                if (listofbooks != null)
+                var bookbyid = this.bookBL.GetBookbyId(BookId);
+                if (bookbyid != null)
                 {
-                    return this.Ok(new { status = 200, isSuccess = true, Message = "List of all books retrieved", data = listofbooks });
+                    return this.Ok(new { status = 200, isSuccess = true, Message = "List of all books retrieved", data = bookbyid });
+                }
+                else
+                {
+                    return this.NotFound(new { status = 404, isSuccess = false, Message = "No books found in database" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 404, isSuccess = false, Message = e.Message });
+            }
+        }
+
+        [HttpDelete("Remove")]
+        public IActionResult RemoveBookFromInventory(int BookId)
+        {
+            try
+            {
+                var bookbyid = this.bookBL.RemoveBookFromInventory(BookId);
+                if (bookbyid)
+                {
+                    return this.Ok(new { status = 200, isSuccess = true, Message = "List of all books retrieved", data = bookbyid });
                 }
                 else
                 {

@@ -178,5 +178,45 @@ namespace RepositoryLayer.Services
                 throw;
             }
         }
+
+        public bool RemoveBookFromInventory(int bookId)
+        {
+            sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
+            try
+            {
+                using (sqlConnection)
+                {
+                    Book book = new Book();
+                    SqlCommand sqlCommand = new SqlCommand("spRemoveBook", sqlConnection);
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+                    sqlCommand.Parameters.AddWithValue("BookId", bookId);
+                    sqlConnection.Open();
+                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        int result = Convert.ToInt32(sqlCommand.ExecuteNonQuery());
+                        if (result!=1)
+                        {
+                            sqlConnection.Close();
+                            return true;
+                        }
+                        else
+                        {
+                            sqlConnection.Close();
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        sqlConnection.Close();
+                        return false;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

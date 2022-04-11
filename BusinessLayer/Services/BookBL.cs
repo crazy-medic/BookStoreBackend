@@ -46,6 +46,18 @@ namespace BusinessLayer.Services
             }
         }
 
+        public bool RemoveBookFromInventory(int bookId)
+        {
+            try
+            {
+                return this.bookRL.RemoveBookFromInventory(bookId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public bool UpdateBook(Book book)
         {
             try
