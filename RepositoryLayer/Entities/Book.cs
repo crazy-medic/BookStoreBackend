@@ -6,15 +6,15 @@ namespace RepositoryLayer.Entities
 {
     public class Book
     {
-        public long BookId;
-        public string BookName;
-        public string Author;
-        public string BookInfo;
-        public int Quantity;
-        public float DiscountPrice;
-        public float ActualPrice;
-        public string BookImage;
-        public float Rating;
-        public long ReviewerCount;
+        public long BookId { get; set; }
+        public string BookName { get; set; }
+        public string Author { get; set; }
+        public string BookInfo { get; set; }
+        public int Quantity { get; set; }
+        public float DiscountPrice { get; set; }
+        public float ActualPrice { get; set; }
+        public string BookImage { get; set; }
+        public float Rating { get; set; }
+        public long ReviewerCount { get; set; }
     }
 }
