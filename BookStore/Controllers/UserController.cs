@@ -96,11 +96,11 @@ namespace BookStore.Controllers
             {
                 if (Password == "" || Password == " ")
                 {
-                    return this.NotFound(new { status = 404, isSuccess = false, Message = "Password cannot be null" });
+                    return this.NotFound(new { status = 404, isSuccess = false, Message = "Password cannot be empty or null" });
                 }
                 else
                 {
-                    return this.NotFound(new { status = 404, isSuccess = false, Message = "Confirm Password cannot be empty" });
+                    return this.NotFound(new { status = 404, isSuccess = false, Message = "Confirm Password cannot be empty or null" });
                 } 
             }
         }
