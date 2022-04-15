@@ -79,15 +79,29 @@ namespace BookStore.Controllers
         [Authorize]
         public IActionResult ResetPassword(string Password,string ConfirmPassword)
         {
-            var email = User.FindFirst(ClaimTypes.Email).Value.ToString();
-            if (Password == ConfirmPassword)
+            if(Password!="" || ConfirmPassword != "" || Password != " " || ConfirmPassword != " ")
             {
-                var reset = this.userBL.ResetPassword(email, Password);
-                return this.Ok(new { status = 200, isSuccess = true, Message = "Password successfully reset", data = Password });
+                var email = User.FindFirst(ClaimTypes.Email).Value.ToString();
+                if (Password == ConfirmPassword)
+                {
+                    var reset = this.userBL.ResetPassword(email, Password);
+                    return this.Ok(new { status = 200, isSuccess = true, Message = "Password successfully reset", data = Password });
+                }
+                else
+                {
+                    return this.BadRequest(new { status = 400, isSuccess = false, Message = "Passwords dont match", data = Password, ConfirmPassword });
+                }
             }
             else
             {
-                return this.BadRequest(new { status = 400, isSuccess = false, Message = "Passwords dont match",data=Password,ConfirmPassword });
+                if (Password == "" || Password == " ")
+                {
+                    return this.NotFound(new { status = 404, isSuccess = false, Message = "Password cannot be null" });
+                }
+                else
+                {
+                    return this.NotFound(new { status = 404, isSuccess = false, Message = "Confirm Password cannot be empty" });
+                } 
             }
         }
     }

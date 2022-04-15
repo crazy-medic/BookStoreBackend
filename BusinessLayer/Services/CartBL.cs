@@ -29,6 +29,18 @@ namespace BusinessLayer.Services
             }
         }
 
+        public bool RemoveFromCart(Cart cart)
+        {
+            try
+            {
+                return this.cartRL.RemoveFromCart(cart);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public bool UpdateCart(Cart cart)
         {
             try

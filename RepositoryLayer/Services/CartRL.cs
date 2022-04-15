@@ -106,5 +106,59 @@ namespace RepositoryLayer.Services
                 throw;
             }
         }
+
+        public bool RemoveFromCart(Cart cart)
+        {
+            sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
+            try
+            {
+                using (sqlConnection)
+                {
+                    SqlCommand sql = new SqlCommand("spRemoveFromCart", sqlConnection);
+                    sql.CommandType = CommandType.StoredProcedure;
+                    sql.Parameters.AddWithValue("CartId", cart.CartId);
+                    sql.Parameters.AddWithValue("BookId", cart.fkBookId);
+                    sql.Parameters.AddWithValue("UserId", cart.fkUserId);
+                    sql.Parameters.AddWithValue("Quantity", cart.Quantity);
+                    sqlConnection.Open();
+                    SqlDataReader reader = sql.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            Cart cartwithbooks = new Cart();
+                            Book bookincart = new Book();
+                            cartwithbooks.CartId = Convert.ToInt32(reader["CartId"]);
+                            bookincart.BookId = Convert.ToInt32(reader["fkBookId"]);
+                            if (cartwithbooks.CartId == cart.CartId)
+                            {
+                                var result = sql.ExecuteScalar();
+                                if (result != null)
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                        return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

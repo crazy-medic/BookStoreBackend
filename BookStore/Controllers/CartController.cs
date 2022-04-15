@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interfaces;
 using CommonLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryLayer.Entities;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace BookStore.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CartController : ControllerBase
@@ -76,6 +78,36 @@ namespace BookStore.Controllers
             {
                 return this.BadRequest(new { status = 400, isSuccess = false, Message = e.Message });
             }
+        }
+
+        [HttpDelete("RemoveFromCart")]
+        public IActionResult RemoveFromCart(Cart cart)
+        {
+            try
+            {
+                var emailId = User.FindFirst("EmailId").ToString();
+                if (emailId != null)
+                {
+                    var result = this.cartBL.RemoveFromCart(cart);
+                    if (result)
+                    {
+                        return this.Ok(new { status = 200, isSuccess = true, Message = "Book removed" });
+                    }
+                    else
+                    {
+                        return this.BadRequest(new { status = 400, isSuccess = false, Message = "Failed to remove the book" });
+                    }
+                }
+                else
+                {
+                    return this.Unauthorized(new { status = 401, isSuccess = false, Message = "Please log in" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 400, isSuccess = false, Message = e.Message });
+            }
+            
         }
     }
 }
