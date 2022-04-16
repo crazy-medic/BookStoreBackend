@@ -80,7 +80,7 @@ namespace BookStore.Controllers
             }
         }
 
-        [HttpDelete("RemoveFromCart")]
+        [HttpDelete("{id}/RemoveFromCart")]
         public IActionResult RemoveFromCart(Cart cart)
         {
             try
