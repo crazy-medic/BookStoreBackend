@@ -40,6 +40,18 @@ namespace BusinessLayer.Services
             }
         }
 
+        public IEnumerable<AddressTypes> GetAddressTypes()
+        {
+            try
+            {
+                return this.addressRL.GetAddressTypes();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public IEnumerable<AddressEntity> GetAllAddress(long userid)
         {
             try

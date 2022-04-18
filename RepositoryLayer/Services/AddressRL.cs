@@ -160,5 +160,40 @@ namespace RepositoryLayer.Services
                 throw;
             }
         }
+
+        public IEnumerable<AddressTypes> GetAddressTypes()
+        {
+            try
+            {
+                sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
+                using (sqlConnection)
+                {
+                    SqlCommand sql = new SqlCommand("spGetAllAddressTypes", sqlConnection);
+                    sql.CommandType = CommandType.StoredProcedure;
+                    sqlConnection.Open();
+                    List<AddressTypes> addressType = new List<AddressTypes>();
+                    SqlDataReader reader = sql.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            AddressTypes type = new AddressTypes();
+                            type.AddressType = reader["AddressType"].ToString();
+                            type.TypeId = Convert.ToInt32(reader["TypeId"]);
+                            addressType.Add(type);
+                        }
+                        return addressType;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

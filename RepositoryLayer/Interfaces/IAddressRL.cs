@@ -11,5 +11,6 @@ namespace RepositoryLayer.Interfaces
         public bool UpdateAddress(AddressEntity address);
         public bool DeleteAddress(AddressEntity address);
         public IEnumerable<AddressEntity> GetAllAddress(long userid);
+        public IEnumerable<AddressTypes> GetAddressTypes();
     }
 }

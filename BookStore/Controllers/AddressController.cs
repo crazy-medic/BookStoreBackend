@@ -141,5 +141,26 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { status = 400, isSuccess = false, Message = e.InnerException.Message });
             }
         }
+
+        [HttpGet("type")]
+        public IActionResult GetAddressType()
+        {
+            try
+            {
+                var result = this.addressBL.GetAddressTypes();
+                if(result != null)
+                {
+                    return this.Ok(new { status = 200, isSuccess = true, Message = "Got all types for address", data = result });
+                }
+                else
+                {
+                    return this.NotFound(new { status = 404, isSuccess = false, Message = "No types found in database" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 400, isSuccess = false, Message = e.InnerException.Message });
+            }
+        }
     }
 }
