@@ -126,20 +126,31 @@ namespace BookStore.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("Remove")]
         public IActionResult RemoveBookFromInventory(int BookId)
         {
             try
             {
-                var bookbyid = this.bookBL.RemoveBookFromInventory(BookId);
-                if (bookbyid)
+                User user = new User();
+                user.EmailId = User.FindFirst("EmailId").ToString();
+                if (user.fkAccountType != 1)
                 {
-                    return this.Ok(new { status = 200, isSuccess = true, Message = "List of all books retrieved", data = bookbyid });
+                    var bookbyid = this.bookBL.RemoveBookFromInventory(BookId);
+                    if (bookbyid)
+                    {
+                        return this.Ok(new { status = 200, isSuccess = true, Message = "List of all books retrieved", data = bookbyid });
+                    }
+                    else
+                    {
+                        return this.NotFound(new { status = 404, isSuccess = false, Message = "No books found in database" });
+                    }
                 }
                 else
                 {
-                    return this.NotFound(new { status = 404, isSuccess = false, Message = "No books found in database" });
+                    return this.Unauthorized(new { status = 401, isSuccess = false, Message = "You are not a seller to remove from inventory" });
                 }
+                
             }
             catch (Exception e)
             {
