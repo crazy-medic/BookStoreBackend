@@ -43,7 +43,14 @@ namespace BookStore.Controllers
             try
             {
                 var login = this.userBL.Login(loginModel);
-                return this.Ok(new { status = 200,isSuccess=true,Message="Logged in",data=login });
+                if (login != null)
+                {
+                    return this.Ok(new { status = 200, isSuccess = true, Message = "Logged in", data = login });
+                }
+                else
+                {
+                    return this.BadRequest(new { status = 400, isSuccess = false, Message = "Something went wrong" });
+                }
             }
             catch (Exception e)
             {

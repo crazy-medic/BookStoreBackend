@@ -22,17 +22,18 @@ namespace RepositoryLayer.Services
 
         private SqlConnection sqlConnection;
         MessageQueue msmq = new MessageQueue();
-        public IConfiguration Configuration { get; }
+        IConfiguration Configuration;
 
         public UserRL(IConfiguration configuration)
         {
-            this.Configuration = configuration;
+            Configuration = configuration;
         }
 
         public async Task Register(RegisterModel registerModel)
         {
             //sqlConnection = new SqlConnection(this.configuration.GetConnectionString("ConnectionString:BookStoreDB"));
             this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
+            string encryptedPass = Encryptpass(registerModel.Password);
             try
             {
                 using (sqlConnection)
@@ -41,7 +42,7 @@ namespace RepositoryLayer.Services
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Parameters.AddWithValue("@FullName", registerModel.FullName);
                     sqlcmd.Parameters.AddWithValue("@EmailId",registerModel.EmailID);
-                    sqlcmd.Parameters.AddWithValue("@Password",registerModel.Password);
+                    sqlcmd.Parameters.AddWithValue("@Password",encryptedPass);
                     sqlcmd.Parameters.AddWithValue("@Phone",registerModel.Phone);
                     sqlcmd.Parameters.AddWithValue("@CreatedAt",DateTime.Now);
                     sqlcmd.Parameters.AddWithValue("@ModifiedAt", DateTime.Now);
@@ -63,7 +64,6 @@ namespace RepositoryLayer.Services
             try
             {
                 User user = new User();
-
                 using (sqlConnection)
                 {
                     SqlCommand sqlcmd = new SqlCommand("spLoginUser", sqlConnection);
@@ -76,12 +76,22 @@ namespace RepositoryLayer.Services
                     {
                         while (reader.Read())
                         {
+                            user.UserId = Convert.ToInt32(reader["UserId"]);
                             user.EmailId = reader["EmailId"].ToString();
                             user.Password = reader["Password"].ToString();
+                            user.FullName = reader["FullName"].ToString();
                         }
-                        string token = GenerateToken(loginModel.EmailId);
-                        sqlConnection.Close();
-                        return token;
+                        string decryptPass = Decryptpass(user.Password);
+                        if(loginModel.Password == decryptPass)
+                        {
+                            string token = GenerateToken(loginModel.EmailId, user.UserId);
+                            sqlConnection.Close();
+                            return token;
+                        }
+                        else
+                        {
+                            return "Password does not match";
+                        }
                     }
                     else
                     {
@@ -97,22 +107,18 @@ namespace RepositoryLayer.Services
             }
         }
 
-        private static string GenerateToken(string EmailId)
+        private static string GenerateToken(string EmailId,long Id)
         {
-            if (EmailId == null)
-            {
-                return null;
-            }
-
             var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenKey = Encoding.ASCII.GetBytes("THIS_IS_MY_KEY_TO_GENERATE_TOKEN");
+            var tokenKey = Encoding.UTF8.GetBytes("qrwlrjgnvw;rtivw;tiu");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim("EmailId", EmailId),
+                    new Claim("Id",Id.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(12),
                 SigningCredentials =
                 new SigningCredentials(
                     new SymmetricSecurityKey(tokenKey),
@@ -134,18 +140,31 @@ namespace RepositoryLayer.Services
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Parameters.AddWithValue("@EmailId", email);
                     sqlConnection.Open();
-                    var result = sqlcmd.ExecuteNonQuery();
-                    if (result!=0)
+                    SqlDataReader reader = sqlcmd.ExecuteReader();
+                    if (reader.HasRows)
                     {
-                        string token = GenerateToken(email);
-                        Sender(token);
-                        sqlConnection.Close();
-                        return token;
+                        var result = sqlcmd.ExecuteNonQuery();
+                        if (result != 0)
+                        {
+                            while (reader.Read())
+                            {
+                                user.EmailId = reader["EmailId"].ToString();
+                                user.Password = reader["Password"].ToString();
+                            }
+                            string token = GenerateToken(email,user.UserId);
+                            Sender(token);
+                            sqlConnection.Close();
+                            return token;
+                        }
+                        else
+                        {
+                            sqlConnection.Close();
+                            return null;
+                        }
                     }
                     else
                     {
-                        sqlConnection.Close();
-                        return null;
+                        return "No user found for this email";
                     }
                 }
             }
@@ -234,6 +253,28 @@ namespace RepositoryLayer.Services
             {
                 throw;
             }
+        }
+
+        public string Encryptpass(string password)
+        {
+            string msg = "";
+            byte[] encode = new byte[password.Length];
+            encode = Encoding.UTF8.GetBytes(password);
+            msg = Convert.ToBase64String(encode);
+            return msg;
+        }
+
+        private string Decryptpass(string encryptpwd)
+        {
+            string decryptpwd = string.Empty;
+            UTF8Encoding encodepwd = new UTF8Encoding();
+            Decoder Decode = encodepwd.GetDecoder();
+            byte[] todecode_byte = Convert.FromBase64String(encryptpwd);
+            int charCount = Decode.GetCharCount(todecode_byte, 0, todecode_byte.Length);
+            char[] decoded_char = new char[charCount];
+            Decode.GetChars(todecode_byte, 0, todecode_byte.Length, decoded_char, 0);
+            decryptpwd = new String(decoded_char);
+            return decryptpwd;
         }
     }
 }
