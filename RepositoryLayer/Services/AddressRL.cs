@@ -88,5 +88,77 @@ namespace RepositoryLayer.Services
                 throw;
             }
         }
+
+        public bool DeleteAddress(AddressEntity address)
+        {
+            try
+            {
+                sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
+                using (sqlConnection)
+                {
+                    SqlCommand sql = new SqlCommand("spRemoveAddress", sqlConnection);
+                    sql.CommandType = CommandType.StoredProcedure;
+                    sql.Parameters.AddWithValue("Address", address.Address);
+                    sqlConnection.Open();
+                    var result = Convert.ToInt32(sql.ExecuteScalar());
+                    if (result != 1)
+                    {
+                        sqlConnection.Close();
+                        return true;
+                    }
+                    else
+                    {
+                        sqlConnection.Close();
+                        return false;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<AddressEntity> GetAllAddress(long userid)
+        {
+            try
+            {
+                sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
+                using (sqlConnection)
+                {
+                    SqlCommand sql = new SqlCommand("spGetAllAddress", sqlConnection);
+                    sql.CommandType = CommandType.StoredProcedure;
+                    sql.Parameters.AddWithValue("fkUserId", userid);
+                    sqlConnection.Open();
+                    List<AddressEntity> address = new List<AddressEntity>();
+                    SqlDataReader reader = sql.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            AddressEntity addressEntity = new AddressEntity();
+                            addressEntity.AddressId = Convert.ToInt32(reader["AddressId"]);
+                            addressEntity.fkUserId = Convert.ToInt32(reader["fkUserId"]);
+                            addressEntity.Address = reader["Address"].ToString();
+                            addressEntity.City = reader["City"].ToString();
+                            addressEntity.State = reader["State"].ToString();
+                            addressEntity.PinCode = Convert.ToInt32(reader["PinCode"]);
+                            addressEntity.fkAddressType = Convert.ToInt32(reader["fkAddressType"]);
+                            address.Add(addressEntity);
+                        }
+                        return address;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

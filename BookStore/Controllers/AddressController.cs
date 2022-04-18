@@ -26,6 +26,7 @@ namespace BookStore.Controllers
         public IActionResult AddAddress(AddressEntity address)
         {
             long userid = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+            address.fkUserId = userid;
             if (userid>0)
             {
                 try
@@ -57,6 +58,7 @@ namespace BookStore.Controllers
             try
             {
                 long userid = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                address.fkUserId = userid;
                 if (userid > 0)
                 {
                     var result = this.addressBL.UpdateAddress(address);
@@ -74,6 +76,65 @@ namespace BookStore.Controllers
                     return this.Unauthorized(new { status = 401, isSuccess = false, Message = "Unauthorized" });
                 }
 
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 400, isSuccess = false, Message = e.InnerException.Message });
+            }
+        }
+
+        [HttpDelete("{userid}/Delete")]
+        public IActionResult DeleteAddress(AddressEntity address)
+        {
+            try
+            {
+                long userid = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                address.fkUserId = userid;
+                if (userid > 0)
+                {
+                    var result = this.addressBL.DeleteAddress(address);
+                    if (result)
+                    {
+                        return this.Ok(new { status = 200, isSuccess = true, Message = "Address deleted successfully" });
+                    }
+                    else
+                    {
+                        return this.BadRequest(new { status = 400, isSuccess = false, Message = "Failed to delete address" });
+                    }
+                }
+                else
+                {
+                    return this.Unauthorized(new { status = 401, isSuccess = false, Message = "Unauthorized" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 400, isSuccess = false, Message = e.InnerException.Message });
+            }
+        }
+
+        [HttpGet("{userid}/Get")]
+        public IActionResult GetAllAddress()
+        {
+            try
+            {
+                long userid = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                if (userid > 0)
+                {
+                    var result = this.addressBL.GetAllAddress(userid);
+                    if (result != null)
+                    {
+                        return this.Ok(new { status = 200, isSuccess = true, Message = "Address retrieved successfully", data = result });
+                    }
+                    else
+                    {
+                        return this.BadRequest(new { status = 400, isSuccess = false, Message = "Failed to retrieve address" });
+                    }
+                }
+                else
+                {
+                    return this.Unauthorized(new { status = 401, isSuccess = false, Message = "Unauthorized" });
+                }
             }
             catch (Exception e)
             {

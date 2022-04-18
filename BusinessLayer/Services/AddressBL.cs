@@ -28,6 +28,30 @@ namespace BusinessLayer.Services
             }
         }
 
+        public bool DeleteAddress(AddressEntity address)
+        {
+            try
+            {
+                return this.addressRL.DeleteAddress(address);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<AddressEntity> GetAllAddress(long userid)
+        {
+            try
+            {
+                return this.addressRL.GetAllAddress(userid);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public bool UpdateAddress(AddressEntity address)
         {
             try
@@ -36,7 +60,7 @@ namespace BusinessLayer.Services
             }
             catch (Exception)
             {
-
+                throw;
             }
         }
     }

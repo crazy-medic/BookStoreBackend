@@ -9,5 +9,7 @@ namespace BusinessLayer.Interfaces
     {
         public bool AddAddress(AddressEntity address);
         public bool UpdateAddress(AddressEntity address);
+        public bool DeleteAddress(AddressEntity address);
+        public IEnumerable<AddressEntity> GetAllAddress(long userid);
     }
 }
