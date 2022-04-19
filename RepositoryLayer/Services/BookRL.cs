@@ -37,9 +37,17 @@ namespace RepositoryLayer.Services
                     sqlCommand.Parameters.AddWithValue("Rating",book.Rating);
                     sqlCommand.Parameters.AddWithValue("ReviewerCount",book.ReviewerCount);
                     sqlConnection.Open();
-                    sqlCommand.ExecuteNonQuery();
-                    sqlConnection.Close();
-                    return true;
+                    var result = Convert.ToInt32(sqlCommand.ExecuteScalar());
+                    if (result != 1)
+                    {
+                        sqlConnection.Close();
+                        return true;
+                    }
+                    else
+                    {
+                        sqlConnection.Close();
+                        return false;
+                    }
                 }
             }
             catch (Exception)

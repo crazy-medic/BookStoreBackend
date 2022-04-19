@@ -2,6 +2,7 @@
 using CommonLayer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RepositoryLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,32 @@ namespace BookStore.Controllers
         [HttpPost("Buy")]
         public IActionResult AddOrder(OrderModel orderModel)
         {
-            
+            try
+            {
+                User user = new User();
+                user.EmailId = User.FindFirst("EmailId").Value.ToString();
+                if (user != null)
+                {
+                    var result = this.orderBL.AddOrder(orderModel);
+                    if (result)
+                    {
+                        return this.Ok(new { status = 200, isSuccess = true, Message = "Book added to inventory" });
+                    }
+                    else
+                    {
+                        return this.BadRequest(new { status = 400, isSuccess = false, Message = "Failed to add order to database" });
+                    }
+                }
+                else
+                {
+                    return this.Unauthorized(new { status = 400, isSuccess = false, Message = "Unauthorized" });
+                }
+
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 400, isSuccess = false, Message = e.Message });
+            }
         }
     }
 }
