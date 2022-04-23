@@ -72,31 +72,23 @@ namespace RepositoryLayer.Services
                     sqlcmd.Parameters.AddWithValue("@Password", loginModel.Password);
                     sqlConnection.Open();
                     SqlDataReader reader = sqlcmd.ExecuteReader();
-                    if (reader.HasRows)
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            user.UserId = Convert.ToInt32(reader["UserId"]);
-                            user.EmailId = reader["EmailId"].ToString();
-                            user.Password = reader["Password"].ToString();
-                            user.FullName = reader["FullName"].ToString();
-                        }
-                        string decryptPass = Decryptpass(user.Password);
-                        if(loginModel.Password == decryptPass)
-                        {
-                            string token = GenerateToken(loginModel.EmailId, user.UserId);
-                            sqlConnection.Close();
-                            return token;
-                        }
-                        else
-                        {
-                            return "Password does not match";
-                        }
+                        user.UserId = Convert.ToInt32(reader["UserId"]);
+                        user.EmailId = reader["EmailId"].ToString();
+                        user.Password = reader["Password"].ToString();
+                        user.FullName = reader["FullName"].ToString();
+                    }
+                    string decryptPass = Decryptpass(user.Password);
+                    if (loginModel.Password == decryptPass)
+                    {
+                        string token = GenerateToken(loginModel.EmailId, user.UserId);
+                        sqlConnection.Close();
+                        return token;
                     }
                     else
                     {
-                        sqlConnection.Close();
-                        return null;
+                        return "Password does not match";
                     }
                 }
                 
