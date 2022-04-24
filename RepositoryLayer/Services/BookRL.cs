@@ -169,7 +169,10 @@ namespace RepositoryLayer.Services
                             book.BookImage = reader["BookImage"].ToString();
                             book.Rating = Convert.ToInt32(reader["Rating"]);
                             book.ReviewerCount = Convert.ToInt32(reader["ReviewerCount"]);
-                            books.Add(book);
+                            if (book.BookId == BookId) 
+                            { 
+                                books.Add(book);
+                            }
                         }
                         sqlConnection.Close();
                         return books;

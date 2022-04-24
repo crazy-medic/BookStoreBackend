@@ -33,11 +33,42 @@ namespace BookStore.Controllers
                     var result = this.orderBL.AddOrder(orderModel);
                     if (result)
                     {
-                        return this.Ok(new { status = 200, isSuccess = true, Message = "Book added to inventory" });
+                        return this.Ok(new { status = 200, isSuccess = true, Message = "Order saved to database" });
                     }
                     else
                     {
                         return this.BadRequest(new { status = 400, isSuccess = false, Message = "Failed to add order to database" });
+                    }
+                }
+                else
+                {
+                    return this.Unauthorized(new { status = 400, isSuccess = false, Message = "Unauthorized" });
+                }
+
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 400, isSuccess = false, Message = e.Message });
+            }
+        }
+
+        [HttpGet("Orders")]
+        public IActionResult GetPastOrders()
+        {
+            try
+            {
+                User user = new User();
+                user.EmailId = User.FindFirst("EmailId").Value.ToString();
+                if (user != null)
+                {
+                    var result = this.orderBL.GetPastOrders(user.UserId);
+                    if (result!=null)
+                    {
+                        return this.Ok(new { status = 200, isSuccess = true, Message = "orders retrieved",data=result });
+                    }
+                    else
+                    {
+                        return this.BadRequest(new { status = 400, isSuccess = false, Message = "Failed to get orders" });
                     }
                 }
                 else

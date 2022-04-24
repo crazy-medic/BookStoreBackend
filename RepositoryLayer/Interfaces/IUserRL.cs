@@ -8,7 +8,7 @@ namespace RepositoryLayer.Interfaces
 {
     public interface IUserRL
     {
-        public Task Register(RegisterModel registerModel);
+        public Task Register(RegisterModel registerModel, int usertype);
 
         public string Login(LoginModel loginModel);
         public string SendResetLink(string email);

@@ -1,5 +1,6 @@
 ﻿using CommonLayer.Models;
 using Microsoft.Extensions.Configuration;
+using RepositoryLayer.Entities;
 using RepositoryLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,67 @@ namespace RepositoryLayer.Services
                     {
                         sqlConnection.Close();
                         return false;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<Order> GetAllOrders(long userId)
+        {
+            try
+            {
+                using (sqlConnection)
+                {
+                    SqlCommand sql = new SqlCommand("spGetAllOrders", sqlConnection);
+                    sql.CommandType = CommandType.StoredProcedure;
+                    SqlCommand sqlc = new SqlCommand("spGetAddress", sqlConnection);
+                    sqlc.CommandType = CommandType.StoredProcedure;
+                    sql.Parameters.AddWithValue("@UserId", userId);
+                    List<Order> orderlist = new List<Order>();
+                    List<AddressEntity> addresslist = new List<AddressEntity>();
+                    SqlDataReader reader = sql.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            Order order = new Order();
+                            order.OrderId = Convert.ToInt32(reader["OrderId"]);
+                            order.UserId = Convert.ToInt32(reader["fkUserId"]);
+                            order.BookId = Convert.ToInt32(reader["fkBookId"]);
+                            order.AddressId = Convert.ToInt32(reader["fkAddress"]);
+                            order.OrderDateTime = (DateTime)reader["OrderDate"];
+                            order.Quantity = Convert.ToInt32(reader["Quantity"]);
+                            order.OrderTotal = (float)reader["TotalPrice"];
+                            AddressEntity addressEntity = new AddressEntity();
+                            sqlc.Parameters.AddWithValue("@AddressId", order.AddressId);
+                            reader = sqlc.ExecuteReader();
+                            while (reader.Read())
+                            {
+                                addressEntity.AddressId = Convert.ToInt32(reader[0]);
+                                addressEntity.fkUserId = Convert.ToInt32(reader[1]);
+                                addressEntity.Address = reader[2].ToString();
+                                addressEntity.City = reader[3].ToString();
+                                addressEntity.State = reader[4].ToString();
+                                addressEntity.PinCode = Convert.ToInt32(reader[5]);
+                                addressEntity.fkAddressType = Convert.ToInt32(reader[6]);
+                                if(addressEntity.AddressId == order.AddressId)
+                                {
+                                    addresslist.Add(addressEntity);
+                                }
+                            }
+                            orderlist.Add(order);
+                        }
+                        sqlConnection.Close();
+                        return orderlist;
+                    }
+                    else
+                    {
+                        sqlConnection.Close();
+                        return null;
                     }
                 }
             }

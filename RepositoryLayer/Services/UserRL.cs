@@ -27,12 +27,11 @@ namespace RepositoryLayer.Services
         public UserRL(IConfiguration configuration)
         {
             Configuration = configuration;
+            sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
         }
 
-        public async Task Register(RegisterModel registerModel)
+        public async Task Register(RegisterModel registerModel, int usertype)
         {
-            //sqlConnection = new SqlConnection(this.configuration.GetConnectionString("ConnectionString:BookStoreDB"));
-            this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
             string encryptedPass = Encryptpass(registerModel.Password);
             try
             {
@@ -45,8 +44,7 @@ namespace RepositoryLayer.Services
                     sqlcmd.Parameters.AddWithValue("@Password",encryptedPass);
                     sqlcmd.Parameters.AddWithValue("@Phone",registerModel.Phone);
                     sqlcmd.Parameters.AddWithValue("@CreatedAt",DateTime.Now);
-                    sqlcmd.Parameters.AddWithValue("@ModifiedAt", DateTime.Now);
-
+                    sqlcmd.Parameters.AddWithValue("@UserType", usertype);
                     sqlConnection.Open();
                     sqlcmd.ExecuteNonQuery();
                     sqlConnection.Close();
@@ -60,7 +58,6 @@ namespace RepositoryLayer.Services
 
         public string Login(LoginModel loginModel)
         {
-            this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
             try
             {
                 User user = new User();
@@ -74,22 +71,27 @@ namespace RepositoryLayer.Services
                     SqlDataReader reader = sqlcmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        user.UserId = Convert.ToInt32(reader["UserId"]);
-                        user.EmailId = reader["EmailId"].ToString();
-                        user.Password = reader["Password"].ToString();
-                        user.FullName = reader["FullName"].ToString();
+                        user.UserId = Convert.ToInt32(reader[0]);
+                        user.FullName = reader[1].ToString();
+                        user.EmailId = reader[2].ToString();
+                        user.Password = reader[3].ToString();
+                        if(user.EmailId == loginModel.EmailId)
+                        {
+                            string decryptPass = Decryptpass(user.Password);
+                            if (loginModel.Password == decryptPass)
+                            {
+                                string token = GenerateToken(loginModel.EmailId, user.UserId);
+                                sqlConnection.Close();
+                                return token;
+                            }
+                            else
+                            {
+                                return "Password does not match";
+                            }
+                        }
                     }
-                    string decryptPass = Decryptpass(user.Password);
-                    if (loginModel.Password == decryptPass)
-                    {
-                        string token = GenerateToken(loginModel.EmailId, user.UserId);
-                        sqlConnection.Close();
-                        return token;
-                    }
-                    else
-                    {
-                        return "Password does not match";
-                    }
+                    return "User not found";
+                    
                 }
                 
             }
@@ -122,7 +124,6 @@ namespace RepositoryLayer.Services
 
         public string SendResetLink(string email)
         {
-            this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
             try
             {
                 using (sqlConnection)
@@ -218,7 +219,6 @@ namespace RepositoryLayer.Services
 
         public bool ResetPassword(string email, string password)
         {
-            this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
             try
             {
                 using (sqlConnection)

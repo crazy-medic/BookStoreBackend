@@ -18,11 +18,11 @@ namespace BusinessLayer.Services
             this.userRL = userRL;
         }
 
-        public async Task Register(RegisterModel registerModel)
+        public async Task Register(RegisterModel registerModel, int usertype)
         {
             try
             {
-                await userRL.Register(registerModel);
+                await userRL.Register(registerModel,usertype);
             }
             catch (Exception)
             {

@@ -24,11 +24,11 @@ namespace BookStore.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<ActionResult> Register(RegisterModel registerModel)
+        public async Task<ActionResult> Register(RegisterModel registerModel,int usertype)
         {
             try
             {
-                await this.userBL.Register(registerModel);
+                await this.userBL.Register(registerModel,usertype);
                 return this.Ok(new { status = 200, isSuccess = true, Message = "Registered successfully", data = registerModel });
             }
             catch (Exception e)
@@ -42,8 +42,10 @@ namespace BookStore.Controllers
         {
             try
             {
+                string nouser = "User not found";
+                string wrongpass = "Password does not match";
                 var login = this.userBL.Login(loginModel);
-                if (login != null)
+                if (login != nouser && login != wrongpass)
                 {
                     return this.Ok(new { status = 200, isSuccess = true, Message = "Logged in", data = login });
                 }

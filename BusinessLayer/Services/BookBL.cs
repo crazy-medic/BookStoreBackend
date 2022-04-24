@@ -10,6 +10,11 @@ namespace BusinessLayer.Services
     public class BookBL : IBookBL
     {
         private readonly IBookRL bookRL;
+
+        public BookBL(IBookRL BookRL)
+        {
+            this.bookRL = BookRL;
+        }
         public bool AddBook(Book book)
         {
             try

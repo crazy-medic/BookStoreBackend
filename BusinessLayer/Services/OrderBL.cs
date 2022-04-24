@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interfaces;
 using CommonLayer.Models;
+using RepositoryLayer.Entities;
 using RepositoryLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,18 @@ namespace BusinessLayer.Services
             try
             {
                 return this.orderRL.AddOrder(orderModel);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<Order> GetPastOrders(long userId)
+        {
+            try
+            {
+                return this.orderRL.GetAllOrders(userId);
             }
             catch (Exception)
             {
