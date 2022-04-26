@@ -107,7 +107,12 @@ namespace BookStore.Controllers
             {
                 return this.BadRequest(new { status = 400, isSuccess = false, Message = e.Message });
             }
-            
+        }
+
+        [HttpGet("Get")]
+        public IActionResult GetCartItems()
+        {
+            return this.Ok(new { status = 200, isSuccess = true, Message = "got books" });
         }
     }
 }
