@@ -49,6 +49,14 @@ namespace BookStore.Controllers
                 {
                     return this.Ok(new { status = 200, isSuccess = true, Message = "Logged in", data = login });
                 }
+                else if(login == nouser)
+                {
+                    return this.BadRequest(new { status = 400, isSuccess = false, Message = "User not found" });
+                }
+                else if (login == wrongpass)
+                {
+                    return this.BadRequest(new { status = 400, isSuccess = false, Message = "Password incorrect" });
+                }
                 else
                 {
                     return this.BadRequest(new { status = 400, isSuccess = false, Message = "Something went wrong" });

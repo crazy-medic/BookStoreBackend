@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Interfaces;
+using CommonLayer.Models;
 using RepositoryLayer.Entities;
 using RepositoryLayer.Interfaces;
 using System;
@@ -15,11 +16,11 @@ namespace BusinessLayer.Services
         {
             this.bookRL = BookRL;
         }
-        public bool AddBook(Book book)
+        public bool AddBook(BookModel bookmodel)
         {
             try
             {
-                return this.bookRL.AddBook(book);
+                return this.bookRL.AddBook(bookmodel);
             }
             catch (Exception)
             {

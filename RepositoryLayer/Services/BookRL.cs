@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CommonLayer.Models;
+using Microsoft.Extensions.Configuration;
 using RepositoryLayer.Entities;
 using RepositoryLayer.Interfaces;
 using System;
@@ -18,7 +19,7 @@ namespace RepositoryLayer.Services
             this.Configuration = configuration;
         }
 
-        public bool AddBook(Book book)
+        public bool AddBook(BookModel book)
         {
             sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
             try

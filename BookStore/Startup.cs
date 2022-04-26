@@ -62,7 +62,7 @@ namespace BookStore
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FundooUserNotesApp", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BookstoreBackEnd", Version = "v3.2" });
                 var securitySchema = new OpenApiSecurityScheme
                 {
                     Description = "Using the Authorization header with the Bearer scheme.",
@@ -92,7 +92,7 @@ namespace BookStore
                 app.UseDeveloperExceptionPage();
                 app.UseCors("AllowOrigin");
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FundooUserNotesApp v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BookstoreBackEnd v1"));
             }
 
             app.UseHttpsRedirection();

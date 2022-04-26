@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Interfaces;
+using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,15 +24,15 @@ namespace BookStore.Controllers
 
         [Authorize]
         [HttpPost("Add")]
-        public IActionResult AddBook(Book book)
+        public IActionResult AddBook(BookModel bookModel)
         {
             try
             {
                 User user = new User();
-                user.EmailId = User.FindFirst("EmailId").Value.ToString();
+                string email = User.FindFirst("EmailId").Value.ToString();
                 if (user.EmailId != null)
                 {
-                    var result = this.bookBL.AddBook(book);
+                    var result = this.bookBL.AddBook(bookModel);
                     if (result)
                     {
                         return this.Ok(new { status = 200, isSuccess = true, Message = "Book added to inventory" });
@@ -45,7 +46,6 @@ namespace BookStore.Controllers
                 {
                     return this.Unauthorized(new { status = 400, isSuccess = false, Message = "Unauthorized" });
                 }
-
             }
             catch (Exception e)
             {

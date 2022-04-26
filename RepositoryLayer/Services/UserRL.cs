@@ -66,19 +66,17 @@ namespace RepositoryLayer.Services
                     SqlCommand sqlcmd = new SqlCommand("spLoginUser", sqlConnection);
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Parameters.AddWithValue("@EmailId", loginModel.EmailId);
-                    sqlcmd.Parameters.AddWithValue("@Password", loginModel.Password);
                     sqlConnection.Open();
                     SqlDataReader reader = sqlcmd.ExecuteReader();
-                    while (reader.Read())
+                    if (reader.HasRows)
                     {
-                        user.UserId = Convert.ToInt32(reader[0]);
-                        user.FullName = reader[1].ToString();
-                        user.EmailId = reader[2].ToString();
-                        user.Password = reader[3].ToString();
-                        if(user.EmailId == loginModel.EmailId)
+                        if (reader.Read())
                         {
-                            string decryptPass = Decryptpass(user.Password);
-                            if (loginModel.Password == decryptPass)
+                            user.UserId = Convert.ToInt32(reader["UserId"]);
+                            user.EmailId = reader["EmailId"].ToString();
+                            user.Password = reader["Password"].ToString();
+                            string encryptPass = Encryptpass(loginModel.Password);
+                            if (user.Password == encryptPass)
                             {
                                 string token = GenerateToken(loginModel.EmailId, user.UserId);
                                 sqlConnection.Close();
@@ -89,9 +87,12 @@ namespace RepositoryLayer.Services
                                 return "Password does not match";
                             }
                         }
+                        return null;
                     }
-                    return "User not found";
-                    
+                    else
+                    {
+                        return "User not found";
+                    }
                 }
                 
             }
@@ -141,6 +142,7 @@ namespace RepositoryLayer.Services
                         {
                             while (reader.Read())
                             {
+                                user.UserId = Convert.ToInt32(reader["UserId"]);
                                 user.EmailId = reader["EmailId"].ToString();
                                 user.Password = reader["Password"].ToString();
                             }
@@ -254,19 +256,6 @@ namespace RepositoryLayer.Services
             encode = Encoding.UTF8.GetBytes(password);
             msg = Convert.ToBase64String(encode);
             return msg;
-        }
-
-        private string Decryptpass(string encryptpwd)
-        {
-            string decryptpwd = string.Empty;
-            UTF8Encoding encodepwd = new UTF8Encoding();
-            Decoder Decode = encodepwd.GetDecoder();
-            byte[] todecode_byte = Convert.FromBase64String(encryptpwd);
-            int charCount = Decode.GetCharCount(todecode_byte, 0, todecode_byte.Length);
-            char[] decoded_char = new char[charCount];
-            Decode.GetChars(todecode_byte, 0, todecode_byte.Length, decoded_char, 0);
-            decryptpwd = new String(decoded_char);
-            return decryptpwd;
         }
     }
 }
