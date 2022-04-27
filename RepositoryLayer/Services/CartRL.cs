@@ -19,11 +19,11 @@ namespace RepositoryLayer.Services
         public CartRL(IConfiguration configuration)
         {
             this.Configuration = configuration;
+            sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
         }
 
         public bool AddToCart(CartModel cart)
         {
-            sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
             try
             {
                 using (sqlConnection)
@@ -54,7 +54,6 @@ namespace RepositoryLayer.Services
 
         public bool UpdateCart(Cart cart)
         {
-            sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
             try
             {
                 using (sqlConnection)
@@ -109,7 +108,6 @@ namespace RepositoryLayer.Services
 
         public bool RemoveFromCart(Cart cart)
         {
-            sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStoreDB"]);
             try
             {
                 using (sqlConnection)
@@ -153,6 +151,40 @@ namespace RepositoryLayer.Services
                     {
                         return false;
                     }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<Cart> GetCartItems(long userid)
+        {
+            try
+            {
+                using (sqlConnection)
+                {
+                    List<Cart> carts = new List<Cart>();
+                    SqlCommand sql = new SqlCommand("spGetAllCarts", sqlConnection);
+                    sql.CommandType = CommandType.StoredProcedure;
+                    sql.Parameters.AddWithValue("Userid", userid);
+                    sqlConnection.Open();
+                    SqlDataReader reader = sql.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            Cart cart = new Cart();
+                            cart.CartId = Convert.ToInt32(reader["CartId"]);
+                            cart.fkBookId = Convert.ToInt32(reader["fkBookId"]);
+                            cart.fkUserId = Convert.ToInt32(reader["fkUserId"]);
+                            cart.Quantity = Convert.ToInt32(reader["Quantity"]);
+                            carts.Add(cart);
+                        }
+                        return carts;
+                    }
+                    return null;
                 }
             }
             catch (Exception)

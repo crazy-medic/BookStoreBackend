@@ -11,5 +11,6 @@ namespace RepositoryLayer.Interfaces
         public bool AddToCart(CartModel cart);
         public bool UpdateCart(Cart cart);
         public bool RemoveFromCart(Cart cart);
+        public IEnumerable<Cart> GetCartItems(long userid);
     }
 }

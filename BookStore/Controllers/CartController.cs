@@ -28,8 +28,8 @@ namespace BookStore.Controllers
         {
             try
             {
-                var emailId = User.FindFirst("EmailId").ToString();
-                if (emailId != null)
+                long userid = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                if (userid > 0)
                 {
                     var result = this.cartBL.AddToCart(cart);
                     if (result)
@@ -51,13 +51,13 @@ namespace BookStore.Controllers
             }
         }
 
-        [HttpPut("{id}/update")]
+        [HttpPut("update")]
         public IActionResult UpdateCart(Cart cart)
         {
             try
             {
-                var emailId = User.FindFirst("EmailId").ToString();
-                if (emailId != null)
+                long userid = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                if (userid > 0)
                 {
                     var result = this.cartBL.UpdateCart(cart);
                     if (result)
@@ -80,13 +80,13 @@ namespace BookStore.Controllers
             }
         }
 
-        [HttpDelete("{id}/RemoveFromCart")]
+        [HttpDelete("RemoveFromCart")]
         public IActionResult RemoveFromCart(Cart cart)
         {
             try
             {
-                var emailId = User.FindFirst("EmailId").ToString();
-                if (emailId != null)
+                long userid = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                if (userid > 0)
                 {
                     var result = this.cartBL.RemoveFromCart(cart);
                     if (result)
@@ -112,7 +112,31 @@ namespace BookStore.Controllers
         [HttpGet("Get")]
         public IActionResult GetCartItems()
         {
-            return this.Ok(new { status = 200, isSuccess = true, Message = "got books" });
+            try
+            {
+                long userid = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                if (userid >0)
+                {
+                    var result = this.cartBL.GetCartItems(userid);
+                    if (result != null)
+                    {
+                        return this.Ok(new { status = 200, isSuccess = true, Message = "Cart items retrieved",data = result });
+                    }
+                    else
+                    {
+                        return this.BadRequest(new { status = 400, isSuccess = false, Message = "Failed to remove the book" });
+                    }
+                }
+                else
+                {
+                    return this.Unauthorized(new { status = 401, isSuccess = false, Message = "Please log in" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(new { status = 400, isSuccess = false, Message = e.Message });
+            }
+            
         }
     }
 }

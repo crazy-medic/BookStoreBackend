@@ -29,6 +29,18 @@ namespace BusinessLayer.Services
             }
         }
 
+        public IEnumerable<Cart> GetCartItems(long userid)
+        {
+            try
+            {
+                return this.cartRL.GetCartItems(userid);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public bool RemoveFromCart(Cart cart)
         {
             try
